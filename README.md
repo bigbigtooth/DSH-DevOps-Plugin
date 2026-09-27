@@ -4,7 +4,7 @@
 
 **把服务器运维搬进 DSH Web：SSH 服务器管理 · 硬件 / 进程 / 日志监控 · AI 巡检 · AI 部署闭环**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](#license)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/%E7%9B%AE%E6%A0%87-Linux%20%7C%20macOS-lightgrey)](#功能特性)
 [![Tests](https://img.shields.io/badge/%E6%B5%8B%E8%AF%95-unit%20%2F%20integration%20%2F%20e2e-green)](#开发与测试)
 
@@ -28,6 +28,20 @@ dsh-devops 是一个 DeepSeek Harness（DSH）Web 插件。
    固定步骤直接执行脚本、未固化步骤由 AI 兜底，失败自动修复（默认最多 2 轮）后重试。
 
 > 巡检永远只读：AI 只分析与建议，不自行修复或重启服务。
+
+## 界面预览
+
+| 服务器总览 | 硬件监控 |
+| --- | --- |
+| ![服务器总览：环形仪表与告警状态](docs/images/servers.png) | ![硬件监控：趋势图表](docs/images/hardware.png) |
+
+| 进程分组与 AI 巡检 | 项目服务详情 |
+| --- | --- |
+| ![进程监控：按项目分组](docs/images/processes.png) | ![项目详情：资源合计](docs/images/project-detail.png) |
+
+**项目运维**：多项目、多仓库、多部署目标，首次 AI 部署 / 手动更新一键触发。
+
+![项目列表](docs/images/projects.png)
 
 ## 功能特性
 
@@ -163,4 +177,4 @@ src/client/       slots 入口 + 大卡片页面模块（服务器/项目 + 各�
 
 ## License
 
-[MIT](package.json)
+[MIT](LICENSE)
