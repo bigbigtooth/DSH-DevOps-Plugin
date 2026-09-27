@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: typecheck + test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.1.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Unit + contract tests
+        run: pnpm test:unit
+
+      - name: DSH runtime contract tests
+        run: pnpm test:contract:dsh
+
+      - name: SSH / deployment integration tests
+        run: pnpm test:integration:ssh && pnpm test:integration:ops
+
+      - name: End-to-end tests
+        run: pnpm test:e2e:web
+
+      - name: Acceptance tests
+        run: pnpm test:acceptance
+
+      - name: Build
+        run: pnpm build
+
+      - name: Verify dsh.bundle.patch target is shipped
+        run: |
+          node -e "
+          const pkg = require('./package.json');
+          const fs = require('fs');
+          const patch = pkg.dsh.bundle.patch.replace(/^\.\//, '');
+          if (!fs.existsSync(patch)) throw new Error('missing ' + patch);
+          for (const f of ['dist/index.js', 'dist/client/client.js', patch]) {
+            if (!pkg.files.some((p) => f.startsWith(p.replace(/\/\$/, '')))) {
+              throw new Error(f + ' is not covered by files[]');
+            }
+          }
+          console.log('manifest OK');
+          "
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dsh-devops-dist
+          path: dist/
+          retention-days: 7

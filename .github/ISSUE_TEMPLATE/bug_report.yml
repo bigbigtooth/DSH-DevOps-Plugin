@@ -1,0 +1,84 @@
+name: Bug report / 缺陷报告
+description: Something in dsh-devops does not behave as documented.
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        English below / 以下为中文。回答其中一种即可。
+
+  - type: input
+    id: version
+    attributes:
+      label: Plugin version / 插件版本
+      placeholder: "0.4.0"
+    validations:
+      required: true
+
+  - type: input
+    id: dsh-version
+    attributes:
+      label: DSH version / DSH 版本
+      description: Output of `dsh --version`
+      placeholder: "0.1.5-rc.2"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: profile
+    attributes:
+      label: Profile / 使用的 profile
+      options:
+        - web
+        - headless
+        - other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Remote host OS / 远程主机系统
+      options:
+        - Linux
+        - macOS
+        - other
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened / 实际发生了什么
+      description: What you expected, and what you got instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce / 复现步骤
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log excerpt / 相关日志片段
+      description: From `/tmp/dsh-web.log`. **Remove all credentials, hostnames and IPs first.**
+      render: shell
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting / 提交前请确认
+      options:
+        - label: I did not paste any credential, private key or host address.
+          required: true
+        - label: I searched existing issues for this.
+          required: false

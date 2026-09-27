@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability / 安全漏洞
+    url: https://github.com/bigbigtooth/DSH-DevOps-Plugin/security/advisories/new
+    about: Report privately. Do not open a public issue for security problems.
+    comments: |
+      Please do not open a public issue for security problems. See SAFETY.md.
+      安全问题请私下报告，不要开公开 issue，详见 SAFETY.md。

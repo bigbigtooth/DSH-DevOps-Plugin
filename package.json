@@ -1,11 +1,35 @@
 {
   "name": "dsh-devops",
-  "version": "0.3.8",
-  "description": "DSH 远程监控与运维插件：SSH 服务器管理、硬件/进程/日志监控、AI 巡检与部署闭环",
+  "version": "0.4.0",
+  "description": "Remote operations for the DSH Web app: SSH server management, hardware/process/log monitoring, read-only AI inspection, and a Git-to-server deploy loop.",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "MIT",
+  "author": "bigbigtooth",
+  "homepage": "https://github.com/bigbigtooth/DSH-DevOps-Plugin#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bigbigtooth/DSH-DevOps-Plugin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bigbigtooth/DSH-DevOps-Plugin/issues"
+  },
+  "keywords": [
+    "dsh-plugin",
+    "dsh",
+    "deepseek-harness",
+    "cordis",
+    "devops",
+    "ssh",
+    "monitoring",
+    "deployment",
+    "server-management",
+    "ai-ops"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "build": "node scripts/build.mjs",
@@ -20,7 +44,8 @@
   },
   "files": [
     "dist",
-    "cordis.patch.yml"
+    "cordis.patch.yml",
+    "screenshots.json"
   ],
   "exports": {
     ".": {

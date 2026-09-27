@@ -2,88 +2,222 @@
 
 # dsh-devops
 
-**把服务器运维搬进 DSH Web：SSH 服务器管理 · 硬件 / 进程 / 日志监控 · AI 巡检 · AI 部署闭环**
+**Server operations inside the DSH Web app: SSH server management · hardware / process / log monitoring · AI inspection · a Git deploy loop**
+
+[English](./README.md) · [中文](./README.zh.md)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/%E7%9B%AE%E6%A0%87-Linux%20%7C%20macOS-lightgrey)](#功能特性)
-[![Tests](https://img.shields.io/badge/%E6%B5%8B%E8%AF%95-unit%20%2F%20integration%20%2F%20e2e-green)](#开发与测试)
+[![DSH](https://img.shields.io/badge/DSH-0.1.5--rc.2-informational)](https://github.com/deepseek-ai/deepseek-harness)
+[![Platform](https://img.shields.io/badge/host-Linux%20%7C%20macOS-lightgrey)](#features)
+[![Tests](https://img.shields.io/badge/tests-unit%20%2F%20contract%20%2F%20e2e%20%2F%20acceptance-passing-green)](#development-and-testing)
+[![dsh-plugin](https://img.shields.io/badge/dsh--plugin-2f6feb)](https://github.com/topics/dsh-plugin)
 
 </div>
 
 ---
 
-## 这是什么
+## What this is
 
-dsh-devops 是一个 DeepSeek Harness（DSH）Web 插件。
-不用离开聊天界面、不用另开终端，你在 DSH 侧栏点开「远程运维」，就能添加 SSH 服务器、
-查看硬件与进程、让 AI 定时巡检日志和进程异常，并把 Git 仓库的代码部署到服务器、重启服务。
+dsh-devops is a [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (DSH) Web
+plugin. Without leaving the chat view or opening a separate terminal, you open **Remote
+Operations** from the DSH sidebar to add SSH servers, watch hardware and processes, have the AI
+inspect logs and process anomalies on a schedule, and deploy a Git repository to a server and
+restart its services.
 
-它最核心的是一个**部署闭环**：
+The core of it is a **deploy loop**:
 
-1. **首次 AI 部署** —— 选定 Git 仓库、分支与目标服务器，AI 通过 SSH 完成环境检查、依赖安装、
-   构建、服务启动与健康验证；
-2. **脚本固化** —— 部署成功后，把可复用的步骤沉淀为带版本管理的 `.sh` 脚本
-   （`候选 → 已验证 → 失效`，哈希防篡改），一次性环境操作与日常更新分开对待；
-3. **一键更新** —— 后续部署在服务器上执行 `git pull --ff-only`（只快进，杜绝意外合并/变基），
-   固定步骤直接执行脚本、未固化步骤由 AI 兜底，失败自动修复（默认最多 2 轮）后重试。
+1. **First AI deploy** — pick a Git repository, a branch and a target server. The AI works over
+   SSH through environment checks, dependency install, build, service start and health
+   verification.
+2. **Script consolidation** — after a successful deploy, the reusable steps are frozen into
+   versioned `.sh` scripts (`candidate → verified → invalidated`, hash-pinned against tampering),
+   so one-off environment work and routine updates are handled separately.
+3. **One-click update** — later deploys run `git pull --ff-only` on the server (fast-forward
+   only, no surprise merges or rebases). Frozen steps run their script, unfrozen steps fall back
+   to the AI, and a failure is retried after AI-assisted repair (2 rounds by default).
 
-> 巡检永远只读：AI 只分析与建议，不自行修复或重启服务。
+> Inspection is always read-only: the AI analyses and recommends, it never repairs or restarts
+> anything on its own. That boundary is enforced structurally by tool permissions, not by prompt
+> wording.
 
-## 界面预览
+## Screenshots
 
-| 服务器总览 | 硬件监控 |
+| Server overview | Hardware monitoring |
 | --- | --- |
-| ![服务器总览：环形仪表与告警状态](docs/images/servers.png) | ![硬件监控：趋势图表](docs/images/hardware.png) |
+| ![Server overview: ring gauges and alert state](docs/images/servers.png) | ![Hardware monitoring: trend charts](docs/images/hardware.png) |
 
-| 进程分组与 AI 巡检 | 项目服务详情 |
+| Process groups and AI inspection | Project service detail |
 | --- | --- |
-| ![进程监控：按项目分组](docs/images/processes.png) | ![项目详情：资源合计](docs/images/project-detail.png) |
+| ![Process monitoring: grouped by project](docs/images/processes.png) | ![Project detail: aggregated resources](docs/images/project-detail.png) |
 
-**项目运维**：多项目、多仓库、多部署目标，首次 AI 部署 / 手动更新一键触发。
+**Projects**: multiple projects, repositories and deploy targets; a first AI deploy and a manual
+update are both one click away.
 
-![项目列表](docs/images/projects.png)
+![Project list](docs/images/projects.png)
 
-## 功能特性
+## Features
 
-### 🖥 服务器管理
+### 🖥 Server management
 
-- 多台 SSH 服务器增删改查；**添加前强制真实登录测试**，能无人值守执行远程命令才能保存
-- 首次连接核对并保存主机指纹，指纹变化即暂停连接
-- 插件私有 SSH 配置，与系统/用户配置完全隔离；支持私钥、跳板机
-- 覆盖 Linux（不设发行版白名单）与 macOS，能力不满足时如实标注「可用 / 受限 / 不可用」及原因
+- Add, edit and remove any number of SSH servers; a **real login test is mandatory before a
+  server can be saved** — it has to execute a remote command unattended
+- The host fingerprint is verified and stored on first connect; a changed fingerprint pauses the
+  connection
+- Plugin-private SSH config, fully isolated from system and user config; supports private keys
+  and jump hosts
+- Covers Linux (no distribution whitelist) and macOS, and labels capability as
+  available / limited / unavailable with the reason when it is not
 
-### 📊 监控与 AI 巡检
+### 📊 Monitoring and AI inspection
 
-- **硬件**：CPU / 内存 / 磁盘使用情况，手动或定时采集（默认 60 秒）
-- **进程**：无需逐个配置，全量枚举运行进程并按项目/服务分组；AI 逐批分析资源与状态异常，
-  给出具体进程与判断依据，分析覆盖率透明展示（部分分析不会伪装成正常）
-- **日志**：按「项目 → 服务 → 日志文件」动态发现日志来源（如读取 Supervisor 实际生效配置），
-  增量读取、告警去重；AI 识别异常与告警，展示级别、摘要与可定位的原文证据
-- **服务端执行**：关闭浏览器不停止巡检；DSH 重启后自动恢复巡检计划，不无限堆积补跑
+- **Hardware**: CPU, memory and disk usage, collected on demand or on a schedule (60s default)
+- **Processes**: no per-process setup — running processes are enumerated in full and grouped by
+  project and service. The AI analyses resource and state anomalies in batches, names the
+  specific process and the reason, and shows analysis coverage transparently (a partial analysis
+  is never presented as normal)
+- **Logs**: log sources are discovered dynamically along project → service → log file (for
+  example by reading Supervisor's actually-effective config), read incrementally, with alert
+  de-duplication. The AI flags anomalies and alerts with a level, a summary and locatable source
+  evidence
+- **Server-side execution**: closing the browser does not stop inspection; the DSH restart
+  restores the inspection schedule without piling up catch-up runs
 
-### 🚀 项目部署
+### 🚀 Project deployment
 
-- 多项目、多仓库、多部署目标；SSH、Git 认证、提权分别配置、分别验证
-- 首次部署由 AI 编排，部署前确定健康检查（预期进程、端口、等待时限），并动态刷新日志监控
-- 后续部署：仓库/分支核对 → `git pull --ff-only` → 依赖更新/构建 → 服务重启 → 健康验证
-- 未提交改动、分支不符、分叉冲突一律停止报告，绝不自动覆盖；默认不提供危险的全量回滚
-- 任务全程持久化，中断后标记「中断/待核对」，核对远程实际状态后才能继续
+- Multiple projects, repositories and deploy targets; SSH, Git credentials and privilege
+  escalation are configured and verified independently
+- The first deploy is orchestrated by the AI, which fixes the health check up front (expected
+  process, port, wait deadline) and refreshes log monitoring dynamically
+- Later deploys: repository / branch reconciliation → `git pull --ff-only` → dependency update /
+  build → service restart → health verification
+- A dirty working tree, a branch mismatch or a diverged remote always stops and reports; it never
+  overwrites automatically, and there is no dangerous bulk rollback
+- Tasks are persisted end to end; an interrupted task is marked as such and cannot continue until
+  the actual remote state has been reconciled
 
-### 🛡 安全设计
+### 🛡 Security design
 
-- 凭据（密码/私钥/口令）**AES-256-GCM 加密存储**，解密材料与配置数据分离
-- 敏感信息在展示、持久化、送入 AI 上下文前统一**脱敏**；密码不进命令、脚本与日志
-- 远程命令经**白名单解析**；巡检为只读边界（工具权限实施，不靠提示词约束）
-- RPC 走宿主认证通道，API 层 zod 全量校验
+- Credentials (passwords, private keys, passphrases) are stored with **AES-256-GCM** encryption,
+  with key material kept separate from configuration data
+- Secrets are **redacted** before they are displayed, persisted, or placed into AI context;
+  passwords never reach command lines, scripts or logs
+- Remote commands go through a **whitelist parser**; inspection is a read-only boundary enforced
+  by tool permissions rather than prompt wording
+- RPC runs over the host's authenticated channel; the API layer validates every payload with zod
+- **No install-time scripts**, no telemetry, and the plugin never holds a model API key of its own
 
-## 快速开始
+## Quick start
 
-### 环境要求
+### Requirements
 
-- DSH Web 宿主（支持 `dsh plugin` 插件机制）
-- Node.js 与 pnpm
+- A DSH Web host that supports the `dsh plugin` mechanism — see [Compatibility](#compatibility)
+  for the versions this was verified against
+- An SSH client that can reach your target servers
+- ⚠️ **Set `DSH_DEVOPS_KEY_FILE` before you save any credential** (see below)
 
-### 构建与安装
+### Install
+
+One command, from a prebuilt tarball — **you do not run a build on your machine**:
+
+```sh
+dsh plugin --profile web add https://github.com/bigbigtooth/DSH-DevOps-Plugin/releases/latest/download/dsh-devops-latest.tgz
+```
+
+You **must restart the host afterwards** — plugin bundles are loaded at boot, and `plugin add`
+only writes the manifest:
+
+```sh
+pkill -f '\.bin/dsh --profile web'
+sleep 2
+nohup ~/.dsh/tooling/node_modules/.bin/dsh --profile web >> /tmp/dsh-web.log 2>&1 &
+```
+
+After installing, a **Remote Operations** entry appears at the bottom of the DSH sidebar, above
+Settings. Click it to open the operations panel, and use "Back to conversation" to return to chat
+at any time.
+
+> For headless use, swap `--profile web` for `--profile headless`. The UI half of this plugin
+> only exists under the web profile; inspection and deployment work in either.
+
+### ⚠️ Three traps
+
+1. **Set the key file first.** Without `DSH_DEVOPS_KEY_FILE` the plugin uses an in-memory key
+   that is regenerated on every host start, so **stored credentials cannot be decrypted after a
+   restart**:
+   ```sh
+   export DSH_DEVOPS_KEY_FILE="$HOME/.dsh-devops/master.key"
+   ```
+   The key file is written with mode `0600`. **There is no recovery path — lose the key file and
+   the credentials are gone.**
+2. **Reinstalling the same version is a no-op.** pnpm serves the same `file:` spec from cache, so
+   remove before adding:
+   ```sh
+   dsh plugin --profile web remove dsh-devops
+   dsh plugin --profile web add <the tarball URL above>
+   ```
+3. **Restart the host.** See above.
+
+## Permissions and side effects
+
+The full disclosure is in **[SAFETY.md](./SAFETY.md)**. Summary:
+
+| Item | Detail |
+| --- | --- |
+| Local files read | Only `<dataDir>` (default `~/.dsh-devops`) and the host storage domain `dsh_devops`. **Not** `~/.ssh`, not shell history |
+| Remote files read | Hardware, processes, logs and the git working tree on the servers you add |
+| Network egress | ① to your servers (SSH); ② to your configured model (inspection and deploy data). **No telemetry, no third-party endpoint** |
+| API keys | The plugin holds **no** model API key of its own; it uses the host's LLM service |
+| Write behaviour | Inspection is read-only; deployment writes only inside a task you explicitly created (`git pull --ff-only`, build, restart) |
+| Conversation data | **Never read and never transmitted.** AI context is assembled from inspection and deployment material only |
+| Install scripts | No `preinstall` / `install` / `postinstall` |
+
+## Compatibility
+
+DSH is entirely on rc and the maintainers state that breaking changes are expected. Align your
+versions with this table:
+
+| dsh-devops | DSH (harness) | Status |
+| --- | --- | --- |
+| 0.4.0 | 0.1.5-rc.2 | ✅ Verified (full test suite plus a real install) |
+| 0.3.x | 0.1.5-rc.2 | ✅ Verified |
+
+Check the host version with `dsh --version`. dsh-devops declares a **stable** range for
+`@deepseek-ai/cordis` (`^4.0.1`; both are optional peers), so there is no prerelease triplet
+matching problem. When the host moves to a new minor, upgrade this plugin first.
+
+## Verify your install
+
+There is no console exporter during install and `ctx.logger` only writes to an in-memory buffer,
+so **neither logs nor exit codes are a verification signal**. The only hard evidence is that the
+layer loads and that a real route answers:
+
+```sh
+# 1) Is the config layer present? (you should see a dsh-devops layer)
+dsh --profile web --dump-config | grep -A5 'dsh-devops'
+
+# 2) The host log should show no activation gate failure
+
+# 3) Open "Remote Operations" after boot and add a server — the mandatory login test
+#    actually executes a remote command, so its success is the real proof
+```
+
+## Configuration
+
+The defaults below can be overridden through the cordis patch layer:
+
+| Field | Default | Description |
+| --- | --- | --- |
+| `dataDir` | `~/.dsh-devops` | Private data directory (SSH config, keys, degraded storage) |
+| `modelRef` | null | Model used for AI inspection and deploy steps; when empty, AI steps honestly report the capability as unavailable |
+| `hardwareIntervalSeconds` | 60 | Hardware collection interval |
+| `processIntervalSeconds` / `logsIntervalSeconds` | 300 | Process / log AI inspection interval |
+| `retentionDays` | 30 | Retention for ordinary history (config and valid scripts are not pruned) |
+| `batchBudgetTokens` | 8000 | Per-batch AI input budget |
+
+The `DSH_DEVOPS_KEY_FILE` environment variable points at the credential master key file
+(see trap 1 above).
+
+## Install from source
 
 ```sh
 git clone https://github.com/bigbigtooth/DSH-DevOps-Plugin.git
@@ -91,89 +225,70 @@ cd DSH-DevOps-Plugin
 pnpm install
 pnpm build && pnpm pack --pack-destination dist
 
-# 换入 DSH 宿主
+dsh plugin --profile web remove dsh-devops   # required before reinstalling the same version
 dsh plugin --profile web add ./dist/dsh-devops-*.tgz
-dsh --profile web
 ```
 
-安装后，DSH 侧栏底部、「设置」上方会出现**远程运维**入口；点击进入独立运维面板，
-点「返回会话」随时恢复聊天。
+Installing from Git means you build it yourself — git installs do not run build scripts.
 
-### 升级注意
-
-两个容易踩的坑：
-
-- **同版本号重装不生效**：pnpm 对相同 `file:` 规格命中缓存，必须先 remove 再 add
-  （或升版本号）：
-  ```sh
-  dsh plugin --profile web remove dsh-devops
-  dsh plugin --profile web add ./dist/dsh-devops-*.tgz
-  ```
-- **必须重启宿主**：插件 bundle 在宿主启动期加载，`plugin add` 后需重启 DSH Web 进程。
-
-## 配置
-
-以下默认值可通过 cordis.yml patch 覆盖：
-
-| 字段 | 默认 | 说明 |
-| --- | --- | --- |
-| `dataDir` | `~/.dsh-devops` | 私有数据目录（SSH 配置、密钥、降级存储） |
-| `modelRef` | null | AI 巡检/部署所用模型；为空时 AI 步骤诚实报告不可用 |
-| `hardwareIntervalSeconds` | 60 | 硬件巡检周期 |
-| `processIntervalSeconds` / `logsIntervalSeconds` | 300 | 进程/日志 AI 巡检周期 |
-| `retentionDays` | 30 | 普通历史保留（配置、有效脚本不清理） |
-| `batchBudgetTokens` | 8000 | 单批 AI 输入预算 |
-
-## 开发与测试
+## Development and testing
 
 ```sh
-pnpm typecheck            # 严格类型（Host/Client/Tests）
-pnpm test:unit            # 契约/SSH/Vault/仓库/执行/采集/巡检/日志/调度/脚本…
-pnpm test:contract:dsh    # 真实 cordis 运行时生命周期 + 重启持久化
-pnpm test:integration:ssh # 私有配置/askpass/指纹/执行/停止
-pnpm test:integration:ops # 真实 git 仓库部署管线
-pnpm test:e2e:web         # 全链路 + 反例矩阵
-pnpm test:acceptance      # 产品验收可执行子集
-pnpm test                 # 全部
+pnpm typecheck            # strict types (host / client / tests)
+pnpm test:unit            # contracts / SSH / vault / repository / execution / probes / inspection / logs / scheduler / scripts…
+pnpm test:contract:dsh    # real cordis runtime lifecycle + restart persistence
+pnpm test:integration:ssh # private config / askpass / fingerprint / execution / stop
+pnpm test:integration:ops # real git repository deploy pipeline
+pnpm test:e2e:web         # full path + counterexample matrix
+pnpm test:acceptance      # executable subset of the product acceptance suite
+pnpm test                 # everything
 ```
 
-## 架构（Host/Client 单 bundle）
+The SSH and deployment integration suites run against an in-process fake, so no real server is
+needed. See [CONTRIBUTING.md](./CONTRIBUTING.md).
+
+## Architecture (single Host / Client bundle)
 
 ```
-src/contracts/    DTO Schema、错误码、部署状态机、API 契约（双端共享）
+src/contracts/    DTO schemas, error codes, deploy state machine, API contracts (shared by both sides)
 src/host/
-  adapters/       端口 + DSH/file/memory 适配（业务零 SDK 依赖）
-  repository/     版本化记录、迁移备份、原子占用、requestId 幂等
-  vault/          AES-256-GCM 凭据封装、脱敏
-  ssh/            命令白名单解析、私有配置生成、OpenSSH 传输（askpass 私有通道）
-  execution/      身份化远程执行单元（意图先行、事实文件、停止核对）
-  probes/         硬件/进程采集（Linux+macOS 解析器，缺字段=null 非 0）
-  agents/         受限 AI 巡检（分批、覆盖率、证据服务端校验）
-  logs/           Supervisor 发现、读写双游标、增量读取、告警去重
-  scheduler/      持久化调度（单飞合并、不补跑、抖动、AI 并发上限）
-  deployment/     git 预检、ff-only 更新、首部署编排、修复(≤2轮)、恢复、核对
-  scripts/        候选→已验证→失效（哈希防篡改、适用性指纹）
-  api/            zod 全量校验的 RPC 分发（/rpc/dsh-devops 认证通道）
-src/client/       slots 入口 + 大卡片页面模块（服务器/项目 + 各自详情页）+ 图表 + 状态模型
+  adapters/       ports + DSH / file / memory adapters (business logic depends on no SDK)
+  repository/     versioned records, migration backups, atomic claim, requestId idempotency
+  vault/          AES-256-GCM credential envelope, redaction
+  ssh/            command whitelist parser, private config generation, OpenSSH transport (private askpass channel)
+  execution/      identified remote execution units (intent first, fact file, stop reconciliation)
+  probes/         hardware / process collection (Linux + macOS parsers, missing fields are null, not 0)
+  agents/         restricted AI inspection (batched, coverage-tracked, evidence verified server-side)
+  logs/           Supervisor discovery, dual cursors, incremental reads, alert de-duplication
+  scheduler/      persistent scheduling (single-flight coalescing, no catch-up, jitter, AI concurrency cap)
+  deployment/     git precheck, ff-only update, first-deploy orchestration, repair (≤2 rounds), recovery, reconciliation
+  scripts/        candidate → verified → invalidated (hash-pinned, applicability fingerprint)
+  api/            zod-validated RPC dispatch (/rpc/dsh-devops on the authenticated channel)
+src/client/       slots entry + large-card page modules (servers / projects + their detail pages) + charts + state model
 ```
 
 <details>
-<summary>插件集成备忘（给二次开发者）</summary>
+<summary>Integration notes (for plugin authors building on this)</summary>
 
-- patch 行不写 `config` 时插件拿到的是 `undefined`（不是 `{}`），`Config` 必须用
-  `.prefault({})` 兜底，否则整棵插件树启动失败。
-- 宿主服务名与存储名有语法约束：服务必须经 `ctx.get(name)` 读取；
-  domain/表名须匹配 `^[a-z][a-z0-9_]*$`（如 `dsh-devops`→`dsh_devops`、
-  `inspectionRuns`→`inspection_runs`），由适配器在边界处映射。
+- When a patch row declares no `config`, the plugin receives `undefined` (not `{}`), so `Config`
+  must fall back with `.prefault({})` or the whole plugin tree fails to boot.
+- Host service names and storage names have syntactic constraints: services must be read through
+  `ctx.get(name)`; domain and table names must match `^[a-z][a-z0-9_]*$` (`dsh-devops`→
+  `dsh_devops`, `inspectionRuns`→`inspection_runs`), mapped at the adapter boundary.
+- On unload, multiple async disposers run **concurrently** (reverse registration order, but with
+  no serial-completion guarantee). Cleanups with an order dependency must be merged into a single
+  disposer returned by **one** `ctx.effect`, awaiting them serially.
 
 </details>
 
-## 文档
+## Documentation
 
-- [产品设计（PROD）](docs/PROD.md) —— 产品目标、需求与设计默认值
-- [实施计划（PLAN）](docs/PLAN.md)
-- [宿主集成（INTEGRATION）](docs/INTEGRATION.md) —— 接入决策与设计要点
-- [验收状态（ACCEPTANCE）](docs/ACCEPTANCE.md) —— 验收结果与兼容矩阵
+- [Product design (PROD)](docs/PROD.md) — product goals, requirements and design defaults
+- [Implementation plan (PLAN)](docs/PLAN.md)
+- [Host integration (INTEGRATION)](docs/INTEGRATION.md) — integration decisions and design notes
+- [Acceptance status (ACCEPTANCE)](docs/ACCEPTANCE.md) — acceptance results and compatibility matrix
+- [Safety and disclosure](SAFETY.md) / [安全与行为披露](SAFETY.zh.md)
+- [Contributing](CONTRIBUTING.md) / [贡献指南](CONTRIBUTING.zh.md)
 
 ## License
 

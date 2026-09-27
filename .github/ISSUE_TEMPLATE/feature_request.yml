@@ -1,0 +1,39 @@
+name: Feature request / 功能建议
+description: Suggest a capability for dsh-devops.
+title: "[feat] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        English below / 以下为中文。回答其中一种即可。
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem / 要解决的问题
+      description: What are you trying to do that is hard or impossible today?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behaviour / 期望的行为
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered / 考虑过的替代方案
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting / 提交前请确认
+      options:
+        - label: This does not weaken the read-only inspection boundary.
+          required: true
+        - label: This does not require storing a new kind of secret in plaintext.
+          required: true
