@@ -1,0 +1,81 @@
+{
+  "name": "dsh-devops",
+  "version": "0.3.8",
+  "description": "DSH 远程监控与运维插件：SSH 服务器管理、硬件/进程/日志监控、AI 巡检与部署闭环",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "license": "MIT",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "build": "node scripts/build.mjs",
+    "pack": "pnpm build && pnpm pack --pack-destination dist",
+    "test:unit": "vitest run tests/unit",
+    "test:contract:dsh": "vitest run tests/integration/contract-dsh",
+    "test:integration:ssh": "vitest run tests/integration/ssh",
+    "test:integration:ops": "vitest run tests/integration/ops",
+    "test:e2e:web": "vitest run tests/e2e",
+    "test:acceptance": "vitest run tests/acceptance",
+    "test": "vitest run"
+  },
+  "files": [
+    "dist",
+    "cordis.patch.yml"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./client": "./dist/client/client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-primitives"
+      ],
+      "platform": "web"
+    }
+  },
+  "dependencies": {
+    "schemastery": "^3.18.0",
+    "zod": "^4.6.5"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "react": "^18.3.1"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "^4.0.2",
+    "@types/node": "^26.2.0",
+    "@types/react": "~18.3.1",
+    "@types/react-dom": "~18.3.1",
+    "esbuild": "^0.28.2",
+    "happy-dom": "^20.14.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "ssh2": "^1.17.0",
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.1"
+  },
+  "packageManager": "pnpm@11.1.2",
+  "pnpm": {
+    "onlyBuiltDependencies": [],
+    "ignoredBuiltDependencies": [
+      "ws"
+    ]
+  }
+}

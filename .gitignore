@@ -1,0 +1,24 @@
+# 依赖
+node_modules/
+
+# 构建产物：dist/ 由 pnpm build 生成（含 client bundle 与 tgz 包）
+dist/
+*.tsbuildinfo
+*.tgz
+
+# 测试覆盖率
+coverage/
+
+# 日志
+*.log
+
+# 本地环境变量与密钥
+.env
+.env.*
+!.env.example
+
+# 编辑器 / 操作系统
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
