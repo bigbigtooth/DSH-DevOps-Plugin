@@ -117,9 +117,13 @@ update are both one click away.
 
 ### Install
 
-One command, from a prebuilt tarball — **you do not run a build on your machine**:
+Prebuilt on both paths — **you never run a build on your machine**:
 
 ```sh
+# from npm (preferred: no build approval needed)
+dsh plugin --profile web add @bigbigtooth/dsh-devops
+
+# or from a prebuilt tarball
 dsh plugin --profile web add https://github.com/bigbigtooth/DSH-DevOps-Plugin/releases/latest/download/dsh-devops-latest.tgz
 ```
 
@@ -152,8 +156,8 @@ at any time.
 2. **Reinstalling the same version is a no-op.** pnpm serves the same `file:` spec from cache, so
    remove before adding:
    ```sh
-   dsh plugin --profile web remove dsh-devops
-   dsh plugin --profile web add <the tarball URL above>
+   dsh plugin --profile web remove @bigbigtooth/dsh-devops
+   dsh plugin --profile web add @bigbigtooth/dsh-devops
    ```
 3. **Restart the host.** See above.
 
@@ -178,8 +182,12 @@ versions with this table:
 
 | dsh-devops | DSH (harness) | Status |
 | --- | --- | --- |
-| 0.4.0 | 0.1.5-rc.2 | ✅ Verified (full test suite plus a real install) |
-| 0.3.x | 0.1.5-rc.2 | ✅ Verified |
+| 0.5.0 | 0.1.5-rc.2 | ✅ Verified (full test suite plus a real install) |
+| 0.4.x | 0.1.5-rc.2 | ✅ Verified |
+
+> The package was renamed from `dsh-devops` to `@bigbigtooth/dsh-devops` in 0.5.0 because the
+> unscoped name on npm is reserved by someone else. 0.4.x remains installable from the
+> `v0.4.0` release assets.
 
 Check the host version with `dsh --version`. dsh-devops declares a **stable** range for
 `@deepseek-ai/cordis` (`^4.0.1`; both are optional peers), so there is no prerelease triplet
@@ -225,8 +233,8 @@ cd DSH-DevOps-Plugin
 pnpm install
 pnpm build && pnpm pack --pack-destination dist
 
-dsh plugin --profile web remove dsh-devops   # required before reinstalling the same version
-dsh plugin --profile web add ./dist/dsh-devops-*.tgz
+dsh plugin --profile web remove @bigbigtooth/dsh-devops   # required before reinstalling the same version
+dsh plugin --profile web add ./dist/bigbigtooth-dsh-devops-*.tgz
 ```
 
 Installing from Git means you build it yourself — git installs do not run build scripts.

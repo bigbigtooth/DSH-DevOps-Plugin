@@ -39,8 +39,8 @@ rm -f dist/*.tgz
 pnpm build && pnpm pack --pack-destination dist
 
 DSH=~/.dsh/tooling/node_modules/.bin/dsh
-$DSH plugin --profile web remove dsh-devops
-$DSH plugin --profile web add "$(pwd)/dist/"dsh-devops-*.tgz
+$DSH plugin --profile web remove @bigbigtooth/dsh-devops
+$DSH plugin --profile web add "$(pwd)/dist/"bigbigtooth-dsh-devops-*.tgz
 
 pkill -f '\.bin/dsh --profile web'
 sleep 2
@@ -50,7 +50,7 @@ nohup ~/.dsh/tooling/node_modules/.bin/dsh --profile web >> /tmp/dsh-web.log 2>&
 必须核实安装副本确实是刚构建的产物，**不能默认 remove → add 一定成功**：
 
 ```sh
-ls -la ~/.dsh/profiles/web/node_modules/dsh-devops/dist/client/client.js
+ls -la ~/.dsh/profiles/web/node_modules/@bigbigtooth/dsh-devops/dist/client/client.js
 ```
 
 ## 验证安装

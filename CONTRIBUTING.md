@@ -43,8 +43,8 @@ rm -f dist/*.tgz
 pnpm build && pnpm pack --pack-destination dist
 
 DSH=~/.dsh/tooling/node_modules/.bin/dsh
-$DSH plugin --profile web remove dsh-devops
-$DSH plugin --profile web add "$(pwd)/dist/"dsh-devops-*.tgz
+$DSH plugin --profile web remove @bigbigtooth/dsh-devops
+$DSH plugin --profile web add "$(pwd)/dist/"bigbigtooth-dsh-devops-*.tgz
 
 pkill -f '\.bin/dsh --profile web'
 sleep 2
@@ -55,7 +55,7 @@ Verify the installed copy is really the artefact you just built — do not assum
 `remove` then `add` succeeded:
 
 ```sh
-ls -la ~/.dsh/profiles/web/node_modules/dsh-devops/dist/client/client.js
+ls -la ~/.dsh/profiles/web/node_modules/@bigbigtooth/dsh-devops/dist/client/client.js
 ```
 
 ## Verifying an install

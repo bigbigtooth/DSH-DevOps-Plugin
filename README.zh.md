@@ -92,9 +92,13 @@ dsh-devops 是一个 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-
 
 ### 安装
 
-一行命令（预构建 tarball，**不需要你在本机跑任何构建**）：
+两条路径都是预构建的，**你不需要在本机跑任何构建**：
 
 ```sh
+# 从 npm 安装（推荐：免掉构建授权）
+dsh plugin --profile web add @bigbigtooth/dsh-devops
+
+# 或从预构建 tarball 安装
 dsh plugin --profile web add https://github.com/bigbigtooth/DSH-DevOps-Plugin/releases/latest/download/dsh-devops-latest.tgz
 ```
 
@@ -122,8 +126,8 @@ nohup ~/.dsh/tooling/node_modules/.bin/dsh --profile web >> /tmp/dsh-web.log 2>&
    密钥文件以 `0600` 写入。**没有找回通道 —— 密钥文件丢了凭据就没了。**
 2. **同版本号重装不生效。** pnpm 对相同 `file:` 规格命中缓存，必须先 remove 再 add：
    ```sh
-   dsh plugin --profile web remove dsh-devops
-   dsh plugin --profile web add <上面的 tarball 地址>
+   dsh plugin --profile web remove @bigbigtooth/dsh-devops
+   dsh plugin --profile web add @bigbigtooth/dsh-devops
    ```
 3. **必须重启宿主。** 见上。
 
@@ -147,8 +151,11 @@ DSH 目前全线在 rc，且官方明确会有破坏性兼容变更。请按下�
 
 | dsh-devops | DSH (harness) | 状态 |
 | --- | --- | --- |
-| 0.4.0 | 0.1.5-rc.2 | ✅ 已实测（含全量测试与实机安装） |
-| 0.3.x | 0.1.5-rc.2 | ✅ 已实测 |
+| 0.5.0 | 0.1.5-rc.2 | ✅ 已实测（含全量测试与实机安装） |
+| 0.4.x | 0.1.5-rc.2 | ✅ 已实测 |
+
+> 0.5.0 起包名从 `dsh-devops` 改为 `@bigbigtooth/dsh-devops` —— 因为 npm 上不带 scope
+> 的同名包已被他人预留占用。0.4.x 仍可从 `v0.4.0` 的 release 资产安装。
 
 宿主版本用 `dsh --version` 查看。`dsh-devops` 对 `@deepseek-ai/cordis` 声明的是
 **正式版**范围（`^4.0.1`，两者均为 optional peer），因此不涉及预发布三元组
@@ -192,8 +199,8 @@ cd DSH-DevOps-Plugin
 pnpm install
 pnpm build && pnpm pack --pack-destination dist
 
-dsh plugin --profile web remove dsh-devops   # 同版本重装必须先 remove
-dsh plugin --profile web add ./dist/dsh-devops-*.tgz
+dsh plugin --profile web remove @bigbigtooth/dsh-devops   # 同版本重装必须先 remove
+dsh plugin --profile web add ./dist/bigbigtooth-dsh-devops-*.tgz
 ```
 
 从 Git 安装需要你自己构建 —— git 安装不跑构建脚本。

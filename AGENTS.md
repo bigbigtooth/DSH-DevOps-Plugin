@@ -62,8 +62,8 @@ pnpm build && pnpm pack --pack-destination dist
 
 # 3. 换入 DSH 宿主的安装副本（remove → add，顺序不能反）
 DSH=~/.dsh/tooling/node_modules/.bin/dsh
-$DSH plugin --profile web remove dsh-devops
-$DSH plugin --profile web add "$(pwd)/dist/"dsh-devops-*.tgz
+$DSH plugin --profile web remove @bigbigtooth/dsh-devops
+$DSH plugin --profile web add "$(pwd)/dist/"bigbigtooth-dsh-devops-*.tgz
 
 # 4. 重启宿主（会短暂中断 DSH Web 会话，属预期行为，无需询问）
 #    必须带上 DSH_DEVOPS_KEY_FILE：不带的话凭据用进程内内存密钥，
@@ -75,8 +75,8 @@ DSH_DEVOPS_KEY_FILE="$HOME/.dsh-devops/master.key" \
   nohup ~/.dsh/tooling/node_modules/.bin/dsh --profile web >> /tmp/dsh-web.log 2>&1 &
 
 # 5. 验证安装副本确实是新产物（时间戳应为刚刚；命中标记说明新代码已就位）
-ls -la ~/.dsh/profiles/web/node_modules/dsh-devops/dist/client/client.js
-grep -c "dsh-spin" ~/.dsh/profiles/web/node_modules/dsh-devops/dist/client/client.js
+ls -la ~/.dsh/profiles/web/node_modules/@bigbigtooth/dsh-devops/dist/client/client.js
+grep -c "dsh-spin" ~/.dsh/profiles/web/node_modules/@bigbigtooth/dsh-devops/dist/client/client.js
 ```
 
 第 5 步的 `grep` 标记会随代码演进过期，换成当次改动中稳定存在的新增字符串即可；
@@ -106,6 +106,13 @@ grep -c "dsh-spin" ~/.dsh/profiles/web/node_modules/dsh-devops/dist/client/clien
 
 ## 分发与发布
 
+- **包名与 `cordis.patch.yml` 的 `name` 必须字面相等。** 宿主把 patch 行的 `name`
+  当**字面模块说明符**保留（只有路径形式才会被转成 file URL），再从 profile 的
+  `node_modules` 解析。改 `package.json` 的 `name` 必须同步改 patch 的 `name`，
+  否则装得上但激活不了。scope 的 `@` 前缀不会被误判成路径。
+- **不要改运行时标识**：`export const name`、client module `id`、`PANEL_ID`、
+  `/rpc/dsh-devops` 路由、存储域 `dsh-devops`、`dataDir` 默认值 `~/.dsh-devops`、
+  `DSH_DEVOPS_KEY_FILE`。这些不是包身份，改了会破坏既有安装与契约测试。
 - **包内不得新增 `preinstall` / `install` / `postinstall`**：一批目录站会把带安装期
   脚本的包标高风险或直接拦装。分发的必须是预构建产物。
 - 包结构的硬门槛（改 `package.json` 时逐条对照）：

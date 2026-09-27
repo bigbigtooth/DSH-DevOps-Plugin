@@ -1,4 +1,6 @@
 # dsh-devops bundle patch: inserts this plugin into a profile's layer stack.
+# The row's `name` is a literal module specifier resolved from the profile's
+# node_modules, so it MUST equal the npm package name (@bigbigtooth/dsh-devops).
 - insert:
     - id: dsh-devops
-      name: 'dsh-devops'
+      name: '@bigbigtooth/dsh-devops'
