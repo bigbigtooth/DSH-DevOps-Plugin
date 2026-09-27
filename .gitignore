@@ -22,3 +22,6 @@ coverage/
 Thumbs.db
 .idea/
 .vscode/
+
+# 临时调试目录
+.tmp-dbg/
